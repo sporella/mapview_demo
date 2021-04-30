@@ -1,0 +1,52 @@
+---
+title: "mapview"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+```
+
+```{r}
+library(sf)
+library(mapview)
+
+ciclovias_2016 <- read_sf("http://datos.cedeus.cl/geoserver/wfs?srsName=EPSG%3A4326&typename=geonode%3Aciclovias_existentes_09_16&outputFormat=json&version=1.0.0&service=WFS&request=GetFeature")
+ciclovias_2018 <- read_sf("http://datos.cedeus.cl/geoserver/wfs?srsName=EPSG%3A4326&typename=geonode%3Aciclovias_sendasmultiproposito_existentes_rms_2019_gorerms&outputFormat=json&version=1.0.0&service=WFS&request=GetFeature")
+
+mapview(ciclovias_2018, color = "purple")+
+  mapview(ciclovias_2016, color = "orange")
+```
+
+# Usando `leafsync::sync()`
+
+```{r}
+library(leafsync)
+
+c2018 <- mapview(ciclovias_2018, color = "purple")
+c2016 <- mapview(ciclovias_2016, color = "orange")
+sync(c2016, c2018)
+```
+
+# También podemos usar rásters
+
+```{r}
+library(raster)
+
+temp_ene <- raster("data/temp_ene.tif")
+temp_jul <- raster("data/temp_jul.tif")
+region <- read_sf("data/metropolitana.geojson")
+
+pal <- scales::brewer_pal(palette = "Spectral", direction = -1)
+
+p1 <- mapview(temp_ene, at = seq(-30, 50, 10), na.color = "transparent", col.regions = pal(5))+
+  mapview(region, col.regions = "transparent", alpha.regions = 0)
+
+p2 <- mapview(temp_jul, at = seq(-30, 50, 10), na.color = "transparent", col.regions = pal(5))+
+  mapview(region, col.regions = "transparent", alpha.regions = 0)
+
+sync(p1, p2)
+
+
+```
+
