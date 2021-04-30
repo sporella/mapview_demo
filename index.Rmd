@@ -7,9 +7,23 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
 ```
 
+# Cargar puntos desde un csv
+
 ```{r}
 library(sf)
+library(tidyverse)
 library(mapview)
+
+
+paradas <- read_csv("data/paradas_frecuentes.csv") %>% 
+  st_as_sf(coords = c("X", "Y"), crs = 32719)
+
+mapview(paradas)
+```
+
+# Cómo mostrar dos capas de información
+
+```{r}
 
 ciclovias_2016 <- read_sf("http://datos.cedeus.cl/geoserver/wfs?srsName=EPSG%3A4326&typename=geonode%3Aciclovias_existentes_09_16&outputFormat=json&version=1.0.0&service=WFS&request=GetFeature")
 ciclovias_2018 <- read_sf("http://datos.cedeus.cl/geoserver/wfs?srsName=EPSG%3A4326&typename=geonode%3Aciclovias_sendasmultiproposito_existentes_rms_2019_gorerms&outputFormat=json&version=1.0.0&service=WFS&request=GetFeature")
